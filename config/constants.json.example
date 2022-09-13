@@ -1,0 +1,19 @@
+{
+  "urls":
+  {
+    "redditWallstreetbetsUrl": "",
+    "redditTestUrl": "",
+    "brokerSandBoxUrl": ""
+  },
+  "modifier":
+  {
+    "gain_flair": "Gain",
+    "today_top": "top/?t=day"
+  },
+  "paths":
+  {
+    "video_url": "",
+    "csv_path": "",
+    "ticker_symbol_path": ""
+  }
+}

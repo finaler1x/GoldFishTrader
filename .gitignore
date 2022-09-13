@@ -1,0 +1,6 @@
+.idea
+venv
+config/constants.json
+config/secrets.json
+config/nasdaq_screener_*
+
