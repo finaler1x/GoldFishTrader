@@ -136,7 +136,7 @@ def init_fish_video_capture(ticker_list):
 
     return ticker
 
-
+# Finish when aquarium arrives..
 def init_fish_cam_capture():
     cv.namedWindow('video')
     cap = cv.VideoCapture(0)

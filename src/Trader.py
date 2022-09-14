@@ -1,34 +1,14 @@
-from alpaca.trading.client import TradingClient
-from alpaca.trading.requests import MarketOrderRequest
-from alpaca.trading.enums import OrderSide, TimeInForce
-from config import configs
-
-
 def init_broker_connection():
-    # test mode ON
-    broker_config = configs.secret.alpaca.sandbox
-
-    return TradingClient(broker_config.api_key, broker_config.api_secret, paper=True)
+    return "test"
 
 
 def create_order(trading_client, ticker):
-
-    # preparing orders
-    market_order_data = MarketOrderRequest(
-        symbol=ticker,
-        qty=0.023,
-        side=OrderSide.BUY,
-        time_in_force=TimeInForce.DAY
-    )
-
-    # Market order
-    market_order = trading_client.submit_order(
-        order_data=market_order_data
-    )
+    pass
 
 
-def execute_trade(ticker):
+def execute_trade(ticker1, ticker2):
     client = init_broker_connection()
-    create_order(client, ticker)
+    create_order(client, ticker1)
+    create_order(client, ticker2)
 
     print("Execute trade.")
