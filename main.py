@@ -4,7 +4,10 @@ from src import FishCapture, WallstreetBets, Trader
 fish_ticker = FishCapture.init_fish_capture()
 
 # get ticker from fish
-# reddit_ticker = WallstreetBets.prepare_reddit_trade()
+reddit_ticker = WallstreetBets.prepare_reddit_trade()
+
+print("fish choice: " + fish_ticker)
+print("reddit choice: " + reddit_ticker)
 
 # trade with ticker
 # trader.execute_trade(fish_ticker)

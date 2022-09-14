@@ -70,7 +70,7 @@ def choose_ticker(posts):
 
                 if post_score > best_post_score:
                     best_post = post
-                    best_ticker = ticker_symbol
+                    best_ticker = ticker_symbol[0]
 
     return best_ticker
 

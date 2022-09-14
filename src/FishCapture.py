@@ -9,17 +9,20 @@ import cv2 as cv
 from config.configs import constant
 
 
-def draw_overlay(frame, cap, ticker1, ticker2):
-    width = cap.get(cv.CAP_PROP_FRAME_WIDTH)
-    height = cap.get(cv.CAP_PROP_FRAME_HEIGHT)
+def get_fish_decision(position, frame_width, ticker_list):
+    if position < frame_width / 2:
+        return ticker_list[0]
+    return ticker_list[1]
 
+
+def draw_overlay(frame, height, width, ticker_list):
     half_width = math.trunc(width / 2)
     start_point = (half_width, 0)
     end_point = (half_width, math.trunc(height))
 
     frame = cv.line(frame, start_point, end_point, (0, 0, 255), 2)
     cv.putText(frame,
-               ticker1,
+               ticker_list[0],
                (5, math.trunc(height / 2)),
                cv.FONT_HERSHEY_SIMPLEX,
                1,
@@ -28,7 +31,7 @@ def draw_overlay(frame, cap, ticker1, ticker2):
                cv.LINE_4)
 
     cv.putText(frame,
-               ticker2,
+               ticker_list[1],
                (half_width + 5, math.trunc(height / 2)),
                cv.FONT_HERSHEY_SIMPLEX,
                1,
@@ -37,6 +40,17 @@ def draw_overlay(frame, cap, ticker1, ticker2):
                cv.LINE_4)
 
     return frame
+
+
+def get_frame_dimensions(cap):
+    width = cap.get(cv.CAP_PROP_FRAME_WIDTH)
+    height = cap.get(cv.CAP_PROP_FRAME_HEIGHT)
+    return height, width
+
+
+def calc_avg_fish_position(x):
+    pass
+    return x
 
 
 def track_fish(filtered, frame):
@@ -68,7 +82,8 @@ def track_fish(filtered, frame):
 
             # cv.drawContours(frame, [contour], -1, (0, 255, 0), 2)
 
-    return frame
+            return frame, c_x
+    return frame, _
 
 
 def apply_color_mask(hsv_frame):
@@ -80,12 +95,13 @@ def apply_color_mask(hsv_frame):
     return result
 
 
-def init_video_capture(ticker1, ticker2):
+def init_fish_video_capture(ticker_list):
+    ticker = ""
     video_path = constant.paths.video_path
 
-    timeout = time.time() + 10  # 10 s
-
     cap = cv.VideoCapture(video_path)
+
+    start_time = time.time()  # 10 s
     while cap.isOpened():
         ret, frame = cap.read()
         # if frame is read correctly ret is True
@@ -97,14 +113,20 @@ def init_video_capture(ticker1, ticker2):
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         result = apply_color_mask(hsv)
 
-        tracked_frame = track_fish(result, frame)
-        frame = draw_overlay(tracked_frame, cap, ticker1, ticker2)
+        # Prep overlay
+        tracked_frame, x_position = track_fish(result, frame)
+        frame_height, frame_width = get_frame_dimensions(cap)
 
-        # Show caps
+        frame = draw_overlay(tracked_frame, frame_height, frame_width, ticker_list)
         cv.imshow('frame', frame)
 
-        if timeout:
-            print("Timeout!")
+        # Give the fish 10s to decide
+        if time.time() - start_time >= 10:
+            # Guarantee only one
+            if isinstance(x_position, int):
+                print("Hey Fish! Times up!")
+                ticker = get_fish_decision(x_position, frame_width, ticker_list)
+                break
 
         if cv.waitKey(1) == ord('q'):
             break
@@ -112,8 +134,10 @@ def init_video_capture(ticker1, ticker2):
     cap.release()
     cv.destroyAllWindows()
 
+    return ticker
 
-def init_video_cam_capture():
+
+def init_fish_cam_capture():
     cv.namedWindow('video')
     cap = cv.VideoCapture(0)
 
@@ -144,10 +168,12 @@ def pick_random_ticker_symbols():
         ticker1 = chosen_rows[0][0]
         ticker2 = chosen_rows[1][0]
 
-        return ticker1, ticker2
+        return [ticker1, ticker2]
 
 
 def init_fish_capture():
-    ticker1, ticker2 = pick_random_ticker_symbols()
-    # init_video_cam_capture()
-    init_video_capture(ticker1, ticker2)
+    ticker_list = pick_random_ticker_symbols()
+    # init_fish_cam_capture()
+    ticker = init_fish_video_capture(ticker_list)
+
+    return ticker
